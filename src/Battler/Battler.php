@@ -113,11 +113,27 @@ abstract class Battler
      */
     public function attack(Battler $opponent)
     {
-        $this->battle->pushMessage(
-            "{$this->read()->name} attacked with {$this->read()->strength} strength"
-        );
-        
-        $opponent->receiveAttack($this);
+        // Use opponent's luck to calculate if the attack should miss
+        $attack_missed = $this->random(0.00, 1.00) < $opponent->read()->luck;
+
+        switch ($attack_missed) {
+            case true:
+                $this->battle->pushMessage(
+                    "{$this->read()->name} was unlucky and missed their attack"
+                );
+                
+                break;
+            
+            case false;
+            default:
+                $this->battle->pushMessage(
+                    "{$this->read()->name} attacked with {$this->read()->strength} strength"
+                );
+                
+                $opponent->receiveAttack($this);
+                
+                break;
+        }
     }
     
     /**
