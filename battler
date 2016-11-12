@@ -5,7 +5,7 @@
 require __DIR__.'/vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
-use dwalker109\CliBattleCommand;
+use dwalker109\Battle\CliBattleCommand;
 
 $app = new Application;
 
