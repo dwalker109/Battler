@@ -2,10 +2,9 @@
 
 namespace dwalker109\Battle;
 
-use dwalker109\Combatant\Brute;
-use dwalker109\Combatant\Grappler;
-use dwalker109\Combatant\Swordsman;
-use dwalker109\Combatant\Combatant;
+use dwalker109\Battler\Brute;
+use dwalker109\Battler\Grappler;
+use dwalker109\Battler\Swordsman;
 
 class Battle
 {
@@ -14,8 +13,8 @@ class Battle
     private $player_current;
     private $player_next;
     
-    // Register available combatant types
-    private $combatant_types = [
+    // Register available battler types
+    private $battler_types = [
         Swordsman::class,
         Brute::class,
         Grappler::class,
@@ -31,7 +30,7 @@ class Battle
      */
     public function __construct($name_1, $name_2)
     {
-        $types = array_rand(array_flip($this->combatant_types), 2);
+        $types = array_rand(array_flip($this->battler_types), 2);
         $this->player_1 = new $types[0]($name_1);
         $this->player_2 = new $types[1]($name_1);
     }

@@ -1,30 +1,30 @@
 <?php
 
-namespace dwalker109\Combatant;
+namespace dwalker109\Battler;
 
-class Grappler extends Combatant
+class Swordsman extends Battler
 {
     // Value constraints used during construction
     protected $property_constraints = [
         "health" => [
-            "min" => 60,
-            "max" => 100,
+            "min" => 40,
+            "max" => 60,
         ],
         "strength" => [
-            "min" => 75,
-            "max" => 80,
+            "min" => 60,
+            "max" => 70,
         ],
         "defence" => [
-            "min" => 35,
-            "max" => 40,
+            "min" => 20,
+            "max" => 30,
         ],
         "speed" => [
-            "min" => 60,
-            "max" => 80,
+            "min" => 90,
+            "max" => 100,
         ],
         "luck" => [
             "min" => 0.3,
-            "max" => 0.4,
+            "max" => 0.5,
         ],
     ];
 }

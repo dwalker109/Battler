@@ -1,10 +1,10 @@
 <?php
 
-namespace dwalker109\Combatant;
+namespace dwalker109\Battler;
 
-abstract class Combatant
+abstract class Battler
 {
-    // Basic combatant properties
+    // Basic battler properties
     private $name;
     private $health;
     private $strength;
