@@ -11,10 +11,14 @@ class Battle
     // Properties to track and display battle state
     public $is_active = true;
     public $messages = [];
+    public $player_1;
+    public $player_2;
     
-    // Handles to participants
-    private $player_1;
-    private $player_2;
+    // Turn tracking
+    private $max_turns = 30;
+    private $current_turn = 1;
+    
+    // Internal handles to participants
     private $player_current;
     private $player_next;
     
@@ -37,28 +41,24 @@ class Battle
     {
         // Create and assign a battler for each player, chosen at random.
         $types = array_rand(array_flip($this->battler_types), 2);
-        $this->player_1 = new $types[0]($name_1, $this);
-        $this->player_2 = new $types[1]($name_2, $this);
-
-        // To decide who attacks first, usort the players based on their props
-        $order = [
-            $this->player_1,
-            $this->player_2,
+        $players = [
+            $player_1 = new $types[0]($name_1, $this),
+            $player_2 = new $types[1]($name_2, $this),
         ];
 
         // Sort by defence, ascending
-        usort($order, function($left, $right) {
+        usort($players, function($left, $right) {
             return $left->read()->defence <=> $right->read()->defence;
         });
         
         // Sort by speed, descending
-        usort($order, function($left, $right) {
+        usort($players, function($left, $right) {
             return $right->read()->speed <=> $left->read()->speed;
         });
         
-        // Shift off the array to set the initial current and next properties
-        $this->player_current = array_shift($order);
-        $this->player_next = array_shift($order);
+        // Use the ordered array to set 'pointers' for the players
+        $this->player_current = $this->player_1 = array_shift($players);
+        $this->player_next = $this->player_2 = array_shift($players);
     }
         
     /**
@@ -68,16 +68,16 @@ class Battle
      */
     public function calculateTurn()
     {
+        // Attack and rotate
         $this->player_current->attack($this->player_next);
+        $this->rotatePlayers();
         
-        foreach(['player_1', 'player_2'] as $player) {
-            if ($this->{$player}->read()->health <= 0) {
-                $this->pushMessage("{$player} lost!");
-                $this->is_active = false;
-            }
+        // Check/increment current turn
+        if ($this->current_turn++ === $this->max_turns) {
+            $this->is_active = false;
+            $this->pushMessage("{$this->max_turns} turns exceeded, a draw is declared.");
         }
         
-        $this->rotatePlayers();
     }
     
     /**
@@ -101,13 +101,7 @@ class Battle
      */
     public function pushMessage(string $message)
     {
-        array_push(
-            $this->messages,
-            [
-                'microtime' => microtime($get_as_float = true),
-                'text' => $message,
-            ]
-        );
+        $this->messages[] = $message;
     }
     
     /**

@@ -72,12 +72,13 @@ abstract class Battler
     public function read()
     {
         return (object) [
-            "name" => $this->name,
-            "health" => $this->health,
-            "strength" => $this->strength,
-            "defence" => $this->defence,
-            "speed" => $this->speed,
-            "luck" => $this->luck,
+            'name' => ucfirst($this->name),
+            'type' => (new \ReflectionClass($this))->getShortName(),
+            'health' => $this->health,
+            'strength' => $this->strength,
+            'defence' => $this->defence,
+            'speed' => $this->speed,
+            'luck' => $this->luck,
         ];
     }
     
@@ -113,8 +114,7 @@ abstract class Battler
     public function attack(Battler $opponent)
     {
         $this->battle->pushMessage(
-            "{$this->read()->name} attacked {$opponent->read()->name} ".
-            "with {$this->read()->strength} strength."
+            "{$this->read()->name} attacked with {$this->read()->strength} strength"
         );
         
         $opponent->receiveAttack($this);
@@ -132,6 +132,25 @@ abstract class Battler
         $damage = $opponent->read()->strength - $this->read()->defence;
         $this->health -= $damage;
         
-        $this->battle->pushMessage("{$this->read()->name} received {$damage} damage.");
+        $this->battle->pushMessage("{$this->read()->name} received {$damage} damage");
+        
+        if (!$this->isAlive()) {
+            $this->battle->is_active = false;
+            $this->battle->pushMessage("{$opponent->read()->name} is the winner!");
+        }
+    }
+    
+    /**
+     * Check for death.
+     *
+     * @return void
+     */
+    public function isAlive()
+    {
+        if ($this->health <= 0) {
+            return false;
+        }
+        
+        return true;
     }
 }

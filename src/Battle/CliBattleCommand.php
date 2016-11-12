@@ -4,6 +4,7 @@ namespace dwalker109\Battle;
 
 use dwalker109\Battle\Battle;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
@@ -54,9 +55,32 @@ class CliBattleCommand extends Command
             $names[$label] = $helper->ask($input, $output, $question);
         }
         
-        // Create the battle and run the game loop
+        // Create the battle and detail the generated combatants
         $battle = new Battle($names['first'], $names['second']);
         
+        $table = new Table($output);
+        $table->setHeaders(
+            ['Order', 'Name', 'Type', 'Health', 'Strength', 'Defence', 'Speed', 'Luck']
+        );
+        
+        foreach (['player_1', 'player_2'] as $index => $player) {
+            $table->addRow(
+                [
+                    $index === 0 ? 'First' : 'Second',
+                    $battle->{$player}->read()->name,
+                    $battle->{$player}->read()->type,
+                    $battle->{$player}->read()->health,
+                    $battle->{$player}->read()->strength,
+                    $battle->{$player}->read()->defence,
+                    $battle->{$player}->read()->speed,
+                    $battle->{$player}->read()->luck,
+                ]
+            );
+        }
+        
+        $table->render();
+        
+        // Run the game loop
         while ($battle->is_active) {
             $battle->calculateTurn();
             $this->render($battle, $output);
@@ -74,15 +98,6 @@ class CliBattleCommand extends Command
     private function render(Battle $battle, OutputInterface $output)
     {
         // Get messages
-        $turn_messages = $battle->popMessages();
-        
-        // // Sort by key (microtime) for display
-        // usort($turn_messages, function ($left, $right) {
-        //     return $left['microtime'] <=> $right['microtime'];
-        // });
-
-        foreach ($turn_messages as $message) {
-            $output->writeln($message['text']);
-        }
+        $output->writeln(implode(', ', $battle->popMessages()));
     }
 }
