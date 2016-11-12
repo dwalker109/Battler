@@ -2,6 +2,8 @@
 
 namespace dwalker109\Battler;
 
+use dwalker109\Battle\Battle;
+
 abstract class Battler
 {
     // Basic battler properties
@@ -11,6 +13,9 @@ abstract class Battler
     private $defence;
     private $speed;
     private $luck;
+    
+    // Action message for this turn
+    private $messages = [];
 
     // Value constraints used during construction
     protected $property_constraints = [
@@ -92,4 +97,58 @@ abstract class Battler
         // Something unusual was passed - return integer 0
         return 0;
     }
+    
+    /**
+     * Attack the opposing Battler.
+     *
+     * @param Battler $opponent
+     *
+     * @return void
+     */
+    public function attack(Battler $opponent)
+    {
+        $opponent->receiveAttack($this);
+        $this->pushMessage(
+            "{$this->name} attacked {$opponent->read()->name} ".
+            "with {$this->read()->strength} strength."
+        );
+    }
+    
+    /**
+     * Receive an attack from the opposing Battler.
+     *
+     * @param Battler $opponent
+     *
+     * @return void
+     */
+    public function receiveAttack(Battler $opponent)
+    {
+        $damage = $opponent->read()->strength - $this->read()->defence;
+        $this->health =- $damage;
+        $this->pushMessage("{$this->read()->name} received {$damage} damage.");
+    }
+    
+    /**
+     * Add an action message for the current turn.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public function pushMessage(string $message)
+    {
+        $this->messages[microtime($get_as_float = true)] = $message;
+    }
+    
+    /**
+     * Return and clear any turn messages.
+     *
+     * @return array
+     */
+    public function popMessages(): array
+    {
+        return $this->messages;
+        $this->messages = [];
+    }
+
 }

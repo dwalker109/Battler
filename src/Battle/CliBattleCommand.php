@@ -71,6 +71,15 @@ class CliBattleCommand extends Command
      */
     private function render(Battle $battle)
     {
-        var_dump($battle);
+        // Get messages from both battlers
+        $turn_messages = array_merge(
+            $battle->player_1->popMessages(),
+            $battle->player_2->popMessages()
+        );
+        
+        // Sort by key (microtime) for display
+        ksort($turn_messages);
+
+        dump($turn_messages);
     }
 }
