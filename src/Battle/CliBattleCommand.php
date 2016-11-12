@@ -41,7 +41,7 @@ class CliBattleCommand extends Command
             $helper = $this->getHelper('question');
             $question = new Question("Please enter the name of the {$label} combatant: ");
             $question->setValidator(function ($answer) {
-                if (strlen($answer) <= 32) {
+                if (strlen($answer) > 32) {
                     throw new \RuntimeException(
                         'The combatant\'s name must be 32 characters or less.'
                     );
