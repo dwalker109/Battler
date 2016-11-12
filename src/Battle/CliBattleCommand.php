@@ -24,7 +24,8 @@ class CliBattleCommand extends Command
     /**
      * Run the command.
      *
-     * @param InputInterface $input, OutputInterface $output
+     * @param InputInterface $input
+     * @param OutputInterface $output
      *
      * @return void
      */
@@ -58,7 +59,7 @@ class CliBattleCommand extends Command
         
         while ($battle->is_active) {
             $battle->calculateTurn();
-            $this->render($battle);
+            $this->render($battle, $output);
         }
     }
     
@@ -66,20 +67,22 @@ class CliBattleCommand extends Command
      * Output the current 'frame' of the Battle to the CLI.
      *
      * @param Battle $battle
+     * @param OutputInterface $output
      *
      * @return void
      */
-    private function render(Battle $battle)
+    private function render(Battle $battle, OutputInterface $output)
     {
-        // Get messages from both battlers
-        $turn_messages = array_merge(
-            $battle->player_1->popMessages(),
-            $battle->player_2->popMessages()
-        );
+        // Get messages
+        $turn_messages = $battle->popMessages();
         
-        // Sort by key (microtime) for display
-        ksort($turn_messages);
+        // // Sort by key (microtime) for display
+        // usort($turn_messages, function ($left, $right) {
+        //     return $left['microtime'] <=> $right['microtime'];
+        // });
 
-        dump($turn_messages);
+        foreach ($turn_messages as $message) {
+            $output->writeln($message['text']);
+        }
     }
 }

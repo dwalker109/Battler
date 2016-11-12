@@ -6,6 +6,9 @@ use dwalker109\Battle\Battle;
 
 abstract class Battler
 {
+    // Handle to the current battle
+    private $battle;
+    
     // Basic battler properties
     private $name;
     private $health;
@@ -45,12 +48,14 @@ abstract class Battler
      * Initialise a new combatant and randomly generate properties.
      *
      * @param string $name
+     * @param Battle $battle
      *
      * @return void
      */
-    public function __construct($name)
+    public function __construct($name, Battle $battle)
     {
         $this->name = $name;
+        $this->battle = $battle;
         
         foreach ($this->property_constraints as $property => $constraints) {
             $this->{$property} = property_exists($this, $property)
@@ -107,11 +112,12 @@ abstract class Battler
      */
     public function attack(Battler $opponent)
     {
-        $opponent->receiveAttack($this);
-        $this->pushMessage(
-            "{$this->name} attacked {$opponent->read()->name} ".
+        $this->battle->pushMessage(
+            "{$this->read()->name} attacked {$opponent->read()->name} ".
             "with {$this->read()->strength} strength."
         );
+        
+        $opponent->receiveAttack($this);
     }
     
     /**
@@ -124,31 +130,8 @@ abstract class Battler
     public function receiveAttack(Battler $opponent)
     {
         $damage = $opponent->read()->strength - $this->read()->defence;
-        $this->health =- $damage;
-        $this->pushMessage("{$this->read()->name} received {$damage} damage.");
+        $this->health -= $damage;
+        
+        $this->battle->pushMessage("{$this->read()->name} received {$damage} damage.");
     }
-    
-    /**
-     * Add an action message for the current turn.
-     *
-     * @param string $message
-     *
-     * @return void
-     */
-    public function pushMessage(string $message)
-    {
-        $this->messages[microtime($get_as_float = true)] = $message;
-    }
-    
-    /**
-     * Return and clear any turn messages.
-     *
-     * @return array
-     */
-    public function popMessages(): array
-    {
-        return $this->messages;
-        $this->messages = [];
-    }
-
 }

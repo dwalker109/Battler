@@ -8,14 +8,15 @@ use dwalker109\Battler\Swordsman;
 
 class Battle
 {
-    // Properties to track battle state
+    // Properties to track and display battle state
     public $is_active = true;
-    private $player_current;
-    private $player_next;
+    public $messages = [];
     
     // Handles to participants
-    public $player_1;
-    public $player_2;
+    private $player_1;
+    private $player_2;
+    private $player_current;
+    private $player_next;
     
     // Register available battler types
     private $battler_types = [
@@ -69,8 +70,9 @@ class Battle
     {
         $this->player_current->attack($this->player_next);
         
-        foreach(["player_1", "player_2"] as $player) {
+        foreach(['player_1', 'player_2'] as $player) {
             if ($this->{$player}->read()->health <= 0) {
+                $this->pushMessage("{$player} lost!");
                 $this->is_active = false;
             }
         }
@@ -88,5 +90,36 @@ class Battle
         $pointer = $this->player_current;
         $this->player_current = $this->player_next;
         $this->player_next = $pointer;
+    }
+    
+    /**
+     * Add an action message for the current turn.
+     *
+     * @param string $message
+     *
+     * @return void
+     */
+    public function pushMessage(string $message)
+    {
+        array_push(
+            $this->messages,
+            [
+                'microtime' => microtime($get_as_float = true),
+                'text' => $message,
+            ]
+        );
+    }
+    
+    /**
+     * Return and clear any turn messages.
+     *
+     * @return array
+     */
+    public function popMessages(): array
+    {
+        $messages = $this->messages;
+        $this->messages = [];
+        
+        return $messages;
     }
 }
