@@ -53,6 +53,23 @@ abstract class Battler
                 : 0;
         }
     }
+
+    /**
+     * Return readable property values, with (TODO!) this turn's modifiers applied.
+     *
+     * @return srdClass
+     */
+    public function read()
+    {
+        return (object) [
+            "name" => $this->name,
+            "health" => $this->health,
+            "strength" => $this->strength,
+            "defence" => $this->defence,
+            "speed" => $this->speed,
+            "luck" => $this->luck,
+        ];
+    }
     
     /**
      * Return a random integer or float within the passed constraints.
