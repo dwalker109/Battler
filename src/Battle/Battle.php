@@ -68,8 +68,10 @@ class Battle
      */
     public function calculateTurn()
     {
-        // Attack, cleanup and rotate
+        // Run pre skills, attack, run post skills, init next turn, rotate
+        $this->player_current->preTurnSkills();
         $this->player_current->attack($this->player_next);
+        $this->player_current->postTurnSkills();
         $this->player_current->initNextTurn();
         $this->rotatePlayers();
         

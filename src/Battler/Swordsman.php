@@ -2,6 +2,8 @@
 
 namespace dwalker109\Battler;
 
+use dwalker109\Skills\LuckyStrike;
+
 class Swordsman extends Battler
 {
     // Attribute definitions
@@ -11,5 +13,10 @@ class Swordsman extends Battler
         'defence' => ['min' => 20, 'max' => 30],
         'speed' => ['min' => 90, 'max' => 100],
         'luck' => ['min' => 0.3, 'max' => 0.5],
+    ];
+    
+    // Special skills
+    protected $skills = [
+        LuckyStrike::class,
     ];
 }

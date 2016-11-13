@@ -3,16 +3,21 @@
 namespace dwalker109\Battler;
 
 use dwalker109\Battle\Battle;
+use dwalker109\Skills\SkillContract;
 
 abstract class Battler
 {
     // Handle to the current battle
-    private $battle;
+    public $battle;
     
     // Battler detail and baseline/turn attributes
     private $name;
     private $attributes;
     private $turn_attributes;
+    
+    // Special skills
+    private $pre_turn_skills = [];
+    private $post_turn_skills = [];
     
     // Attribute definitions
     protected $definitions = [
@@ -22,6 +27,9 @@ abstract class Battler
         'speed' => ['min' => 0, 'max' => 100],
         'luck' => ['min' => 0.00, 'max' => 1.00],
     ];
+    
+    // Special skills
+    protected $skills = [];
     
     /**
      * Initialise a new combatant and generate attributes.
@@ -53,6 +61,21 @@ abstract class Battler
             'stunned' => false,
             'evaded' => false,
         ];
+        
+        // Register special skills
+        foreach ($this->skills as $skill) {
+            $skill = new $skill;
+            
+            switch ($skill->type()) {
+                case SkillContract::PRE:
+                    $this->pre_turn_skills[] = $skill;
+                    break;
+                
+                case SkillContract::POST:
+                    $this->post_turn_skills[] = $skill;
+                    break;
+            }
+        }
         
         // Prepare for next turn.
         $this->initNextTurn();
@@ -176,6 +199,30 @@ abstract class Battler
         }
         
         return true;
+    }
+    
+    /**
+     * Run any registered pre turn special skills.
+     *
+     * @return void;
+     */
+    public function preTurnSkills()
+    {
+        foreach($this->pre_turn_skills as $skill) {
+            $skill->activate($this);
+        }
+    }
+    
+    /**
+     * Run any registered post turn special skills.
+     *
+     * @return void;
+     */
+    public function postTurnSkills()
+    {
+        foreach($this->post_turn_skills as $skill) {
+            $skill->activate($this);
+        }
     }
     
     /**
