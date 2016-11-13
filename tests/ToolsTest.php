@@ -1,6 +1,6 @@
 <?php
-use PHPUnit\Framework\TestCase;
 
+use PHPUnit\Framework\TestCase;
 use dwalker109\Tools;
 
 class ToolsTest extends TestCase

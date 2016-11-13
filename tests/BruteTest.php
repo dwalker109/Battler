@@ -1,10 +1,9 @@
 <?php
-use PHPUnit\Framework\TestCase;
 
+use PHPUnit\Framework\TestCase;
 use dwalker109\Battle\Battle;
 use dwalker109\Battler\Battler;
 use dwalker109\Battler\Brute;
-use dwalker109\Skills\SkillContract;
 use SebastianBergmann\PeekAndPoke\Proxy;
 
 class BruteTest extends TestCase

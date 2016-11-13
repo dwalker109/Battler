@@ -1,6 +1,6 @@
 <?php
-use PHPUnit\Framework\TestCase;
 
+use PHPUnit\Framework\TestCase;
 use dwalker109\Battle\Battle;
 use dwalker109\Battler\Battler;
 use dwalker109\Battler\Swordsman;
@@ -50,100 +50,99 @@ class BattlerTest extends TestCase
             'speed' => 50,
             'luck' => 0.5,
         ];
-        
+
         $battler->attr($expected);
-        
+
         $this->assertEquals($expected, (array) $battler->attr());
     }
-    
+
     /**
      * @depends testBattlerIsCreated
      */
     public function testStunnedBattlerCannotAttack(Battler $battler)
     {
         $opponent = clone $battler;
-        
+
         $battler->attr(['stunned' => true]);
-        
+
         $result = $battler->attack($opponent);
-        
+
         $this->assertNotTrue($result);
     }
-    
+
     /**
      * @depends testBattlerIsCreated
      */
     public function testLuckyBattlerCannotBeHit(Battler $battler)
     {
         $battler->attr(['stunned' => false]);
-        
+
         $opponent = clone $battler;
         $opponent->attr(['luck' => 1.00]);
-        
+
         $battler->attack($opponent);
 
         $this->assertTrue($opponent->attr()->evaded);
     }
-    
+
     /**
      * @depends testBattlerIsCreated
      */
     public function testUnluckyBattlerCannotEvade(Battler $battler)
     {
         $battler->attr(['stunned' => false]);
-        
+
         $opponent = clone $battler;
         $opponent->attr(['luck' => 0.00]);
-        
+
         $battler->attack($opponent);
 
         $this->assertFalse($opponent->attr()->evaded);
     }
-    
+
     /**
      * @depends testBattlerIsCreated
      */
     public function testAttackCausesDamage(Battler $battler)
     {
         $opponent = clone $battler;
-        
+
         $opponent->attr([
             'luck' => 0.00,
             'defence' => 0,
         ]);
-        
+
         $battler->attr([
             'strength' => 1,
         ]);
-        
+
         $expected = $opponent->attr()->health - 1;
-        
+
         $battler->attack($opponent);
-        
+
         $this->assertEquals($expected, $opponent->attr()->health);
     }
-    
+
     /**
      * @depends testBattlerIsCreated
      */
     public function testDefenceReducesDamage(Battler $battler)
     {
         $opponent = clone $battler;
-        
+
         $opponent->attr([
             'luck' => 0.00,
             'defence' => 5,
         ]);
-        
+
         $battler->attr([
             'strength' => 10,
         ]);
-        
+
         $expected = $opponent->attr()->health - 5;
-        
+
         $battler->attack($opponent);
-        
+
         $this->assertEquals($expected, $opponent->attr()->health);
     }
-
 }
