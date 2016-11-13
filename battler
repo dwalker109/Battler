@@ -8,7 +8,9 @@ use Symfony\Component\Console\Application;
 use dwalker109\Battle\CliBattleCommand;
 
 $app = new Application;
+$command = new CliBattleCommand();
 
-$app->add(new CliBattleCommand());
+$app->add($command);
+$app->setDefaultCommand($command->getName());
 
 $app->run();
