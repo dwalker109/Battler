@@ -144,7 +144,7 @@ abstract class Battler
      */
     public function evade(Battler $opponent)
     {
-        $evaded = Tools::randomNumber(0.00, 1.00) < $this->attr()->luck;
+        $evaded = Tools::randomNumber(0.00, 1.00) <= $this->attr()->luck;
 
         if ($evaded) {
             $this->battle->pushMessage(
