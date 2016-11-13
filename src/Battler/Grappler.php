@@ -2,6 +2,8 @@
 
 namespace dwalker109\Battler;
 
+use dwalker109\Skills\CounterAttack;
+
 class Grappler extends Battler
 {
     // Attribute definitions
@@ -11,5 +13,10 @@ class Grappler extends Battler
         'defence' => ['min' => 35, 'max' => 40],
         'speed' => ['min' => 60, 'max' => 80],
         'luck' => ['min' => 0.3, 'max' => 0.4],
+    ];
+    
+    // Special skills
+    protected $skills = [
+        CounterAttack::class,
     ];
 }
