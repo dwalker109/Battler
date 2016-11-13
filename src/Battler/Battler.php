@@ -17,8 +17,8 @@ abstract class Battler
     private $turn_attributes;
 
     // Special skills loaded for this instance
-    private $pre_turn_skills = [];
-    private $post_turn_skills = [];
+    protected $pre_turn_skills = [];
+    protected $post_turn_skills = [];
 
     // Special skills to load (override in implementing class)
     protected $skills = [];
