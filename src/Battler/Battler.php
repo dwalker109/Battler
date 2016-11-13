@@ -148,7 +148,8 @@ abstract class Battler
 
         if ($evaded) {
             $this->battle->pushMessage(
-                "{$opponent->attr()->name} was unlucky and missed their attack"
+                "{$opponent->attr()->name} missed their attack as " .
+                "{$this->attr()->name} was lucky and managed to evade"
             );
 
             $this->attr(['evaded' => true]);
