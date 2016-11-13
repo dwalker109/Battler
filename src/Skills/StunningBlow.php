@@ -14,7 +14,7 @@ class StunningBlow implements SkillContract
      */
     public function type()
     {
-        return static::PRE;
+        return static::POST;
     }
 
     /**
@@ -26,7 +26,7 @@ class StunningBlow implements SkillContract
     {
         $opponent = $battler->battle->player_opponent;
 
-        if ($opponent->attr()->was_hit && Tools::percentageChance(2)) {
+        if ($opponent->attr()->was_hit && Tools::percentChance(2)) {
             $battler->battle->pushMessage("{$battler->attr()->name} activated skill Stunning Blow");
             $opponent->attr(['stunned' => true]);
         }
