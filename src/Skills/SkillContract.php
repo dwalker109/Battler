@@ -8,7 +8,7 @@ interface SkillContract
 {
     const PRE = 'pre';
     const POST = 'post';
-    
+
     public function type();
     public function activate(Battler $battler);
 }

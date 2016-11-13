@@ -14,7 +14,7 @@ class Brute extends Battler
         'speed' => ['min' => 40, 'max' => 65],
         'luck' => ['min' => 0.3, 'max' => 0.35],
     ];
-    
+
     // Special skills
     protected $skills = [
         StunningBlow::class,

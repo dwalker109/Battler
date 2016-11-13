@@ -14,7 +14,7 @@ class Swordsman extends Battler
         'speed' => ['min' => 90, 'max' => 100],
         'luck' => ['min' => 0.3, 'max' => 0.5],
     ];
-    
+
     // Special skills
     protected $skills = [
         LuckyStrike::class,

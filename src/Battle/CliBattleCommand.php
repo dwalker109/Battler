@@ -2,7 +2,6 @@
 
 namespace dwalker109\Battle;
 
-use dwalker109\Battle\Battle;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,22 +12,18 @@ class CliBattleCommand extends Command
 {
     /**
      * Set up this Symfony command.
-     *
-     * @return void
      */
     protected function configure()
     {
-        $this->setName("battle:run");
-        $this->setDescription("Runs a CLI based battle.");
+        $this->setName('battle:run');
+        $this->setDescription('Runs a CLI based battle.');
     }
 
     /**
      * Run the command.
      *
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
-     *
-     * @return void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -37,7 +32,7 @@ class CliBattleCommand extends Command
             'first' => null,
             'second' => null,
         ];
-        
+
         // Get each name from CLI and validate the length
         foreach ($names as $label => $name) {
             $helper = $this->getHelper('question');
@@ -48,28 +43,28 @@ class CliBattleCommand extends Command
                         'The combatant\'s name must be 32 characters or less.'
                     );
                 }
-                
+
                 if (strlen($answer) < 1) {
                     throw new \RuntimeException(
                         'You did not enter a name for the combatant.'
                     );
                 }
-                
+
                 return $answer;
             });
-            
+
             $names[$label] = $helper->ask($input, $output, $question);
         }
-        
+
         // Create the battle, generating a battler for each name
         $battle = new Battle($names['first'], $names['second']);
-        
+
         // Output a table detailing each combatant
         $table = new Table($output);
         $table->setHeaders(
             ['Order', 'Name', 'Type', 'Health', 'Strength', 'Defence', 'Speed', 'Luck']
         );
-        
+
         foreach (['player_current', 'player_opponent'] as $index => $player) {
             $table->addRow(
                 [
@@ -84,23 +79,21 @@ class CliBattleCommand extends Command
                 ]
             );
         }
-        
+
         $table->render();
-        
+
         // Run the game loop
         while ($battle->is_active) {
             $battle->calculateTurn();
             $this->render($battle, $output);
         }
     }
-    
+
     /**
      * Output the current 'frame' of the Battle to the CLI.
      *
-     * @param Battle $battle
+     * @param Battle          $battle
      * @param OutputInterface $output
-     *
-     * @return void
      */
     private function render(Battle $battle, OutputInterface $output)
     {

@@ -14,7 +14,7 @@ class Grappler extends Battler
         'speed' => ['min' => 60, 'max' => 80],
         'luck' => ['min' => 0.3, 'max' => 0.4],
     ];
-    
+
     // Special skills
     protected $skills = [
         CounterAttack::class,

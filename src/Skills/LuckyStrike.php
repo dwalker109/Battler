@@ -10,19 +10,17 @@ class LuckyStrike implements SkillContract
     /**
      * Return type (pre or post turn) skill.
      *
-     * @return string; 
+     * @return string;
      */
     public function type()
     {
         return static::PRE;
     }
-    
+
     /**
      * Activate the skill.
      *
      * @param Battler $battler
-     *
-     * @return void;
      */
     public function activate(Battler $battler)
     {
