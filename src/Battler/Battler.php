@@ -132,6 +132,15 @@ abstract class Battler
      */
     public function attack(Battler $opponent)
     {
+        // Miss this attack if attacked is stunned
+        if ($this->attr()->stunned) {
+            $this->battle->pushMessage(
+                "{$this->attr()->name} is stunned and cannot attack"
+            );
+        
+            return;
+        }
+        
         // Use opponent's luck to calculate if the attack should miss
         if (!$opponent->evade($this)) {
             $this->battle->pushMessage(
@@ -214,6 +223,10 @@ abstract class Battler
      */
     public function preTurnSkills()
     {
+        if (!$this->battle->is_active) {
+            return;
+        }
+        
         foreach($this->pre_turn_skills as $skill) {
             $skill->activate($this);
         }
@@ -226,6 +239,10 @@ abstract class Battler
      */
     public function postTurnSkills()
     {
+        if (!$this->battle->is_active) {
+            return;
+        }
+
         foreach($this->post_turn_skills as $skill) {
             $skill->activate($this);
         }
