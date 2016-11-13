@@ -58,6 +58,8 @@ abstract class Battler
             'type' => (new \ReflectionClass($this))->getShortName(),
             
             // Status and effects
+            'hit_opponent' => false,
+            'was_hit' => false,
             'stunned' => false,
             'evaded' => false,
         ];
@@ -131,23 +133,14 @@ abstract class Battler
     public function attack(Battler $opponent)
     {
         // Use opponent's luck to calculate if the attack should miss
-        switch ($opponent->evade()) {
-            case true:
-                $this->battle->pushMessage(
-                    "{$this->attr()->name} was unlucky and missed their attack"
-                );
-                
-                break;
+        if (!$opponent->evade($this)) {
+            $this->battle->pushMessage(
+                "{$this->attr()->name} attacked with {$this->attr()->strength} strength"
+            );
             
-            case false;
-            default:
-                $this->battle->pushMessage(
-                    "{$this->attr()->name} attacked with {$this->attr()->strength} strength"
-                );
-                
-                $opponent->defend($this);
-                
-                break;
+            $opponent->attr(['was_hit' => true]);
+            
+            $opponent->defend($this);
         }
     }
     
@@ -160,27 +153,27 @@ abstract class Battler
      */
     public function defend(Battler $opponent)
     {
-        // Calculate damage (prevent negative damage) and subtract from health
+        // Calculate and apply damage (prevent negative damage)
         $damage = max(0, $opponent->attr()->strength - $this->attr()->defence);
-        $this->attributes['health'] -= $damage;
-        
-        $this->battle->pushMessage("{$this->attr()->name} received {$damage} damage");
-        
-        // End the battle if attack was fatal
-        if (!$this->isAlive()) {
-            $this->battle->is_active = false;
-            $this->battle->pushMessage("{$opponent->attr()->name} is the winner!");
-        }
+        $this->takeDamage($damage, $opponent);
     }
     
     /**
      * Try to evade an incoming attack.
      *
+     * @param Battler $opponent
+     *
      * @return boolean
      */
-    public function evade()
+    public function evade(Battler $opponent)
     {
         $evaded = $this->random(0.00, 1.00) < $this->attr()->luck;
+    
+        if ($evaded) {
+            $this->battle->pushMessage(
+                "{$opponent->attr()->name} was unlucky and missed their attack"
+            );
+        }
         
         $this->attr(compact('evaded'));
         
@@ -188,19 +181,32 @@ abstract class Battler
     }
     
     /**
-     * Check for death.
+     * Recieve damage and ensure attributes are updated properly
+     *
+     * @param int $damage
+     * @param Battler $opponent
      *
      * @return void
      */
-    public function isAlive()
+    public function takeDamage(int $damage, Battler $opponent)
     {
-        if ($this->attr()->health <= 0) {
-            return false;
-        }
+        // Set health instantly in both persistent and turn attribs, prevent negative health
+        $this->attributes['health'] = $this->turn_attributes['health'] = max(
+            0, $this->attr()->health - $damage
+        );
         
-        return true;
+        $this->battle->pushMessage(
+            "{$this->attr()->name} received {$damage} damage, {$this->attr()->health} health remaining"
+        );
+        
+        // End the battle if damage is fatal
+        if ($this->attr()->health <= 0) {
+            $this->battle->is_active = false;
+            $this->battle->pushMessage("{$opponent->attr()->name} is the winner!");
+        }
+
     }
-    
+        
     /**
      * Run any registered pre turn special skills.
      *
