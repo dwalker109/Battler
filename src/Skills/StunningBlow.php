@@ -3,13 +3,14 @@
 namespace dwalker109\Skills;
 
 use dwalker109\Battler\Battler;
+use dwalker109\Tools;
 
 class StunningBlow implements SkillContract
 {
     /**
      * Return type (pre or post turn) skill.
      *
-     * @return string; 
+     * @return string;
      */
     public function type()
     {
@@ -27,7 +28,7 @@ class StunningBlow implements SkillContract
     {
         $opponent = $battler->battle->player_opponent;
         
-        if ($opponent->attr()->was_hit && $battler->random(1, 100) <= 2) {
+        if ($opponent->attr()->was_hit && Tools::percentageChance(2)) {
             $battler->battle->pushMessage("{$battler->attr()->name} activated skill Stunning Blow");
             $opponent->attr(['stunned' => true]);
         }

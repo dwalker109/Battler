@@ -3,6 +3,7 @@
 namespace dwalker109\Skills;
 
 use dwalker109\Battler\Battler;
+use dwalker109\Tools;
 
 class LuckyStrike implements SkillContract
 {
@@ -25,7 +26,7 @@ class LuckyStrike implements SkillContract
      */
     public function activate(Battler $battler)
     {
-        if ($battler->random(1, 100) <= 5) {
+        if (Tools::percentChance(5)) {
             $battler->attr(['strength' => $battler->attr()->strength * 2]);
             $battler->battle->pushMessage("{$battler->attr()->name} activated skill Lucky Strike");
         }

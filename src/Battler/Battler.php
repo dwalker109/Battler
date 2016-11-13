@@ -4,6 +4,7 @@ namespace dwalker109\Battler;
 
 use dwalker109\Battle\Battle;
 use dwalker109\Skills\SkillContract;
+use dwalker109\Tools;
 
 abstract class Battler
 {
@@ -46,7 +47,7 @@ abstract class Battler
         
         // Build attributes from definitions
         foreach ($this->definitions as $attribute => $constraints) {
-            $this->attributes[$attribute] = $this->random(
+            $this->attributes[$attribute] = Tools::randomNumber(
                 $constraints['min'], $constraints['max']
             );
         }
@@ -100,29 +101,7 @@ abstract class Battler
         
         return (object) $this->turn_attributes;
     }
-    
-    /**
-     * Return a random integer or float within the passed constraints.
-     *
-     * @param int|float $min
-     * @param int|float $max
-     *
-     * @return int|float
-     */
-    public function random($min, $max)
-    {
-        if (is_integer($min) && is_integer($max)) {
-            return mt_rand($min, $max);
-        }
         
-        if (is_float($min) && is_float($max)) {
-            return ($min + lcg_value() * (abs($max - $min)));
-        }
-        
-        // Something unusual was passed - return integer 0
-        return 0;
-    }
-    
     /**
      * Attack the opposing Battler.
      *
@@ -176,7 +155,7 @@ abstract class Battler
      */
     public function evade(Battler $opponent)
     {
-        $evaded = $this->random(0.00, 1.00) < $this->attr()->luck;
+        $evaded = Tools::randomNumber(0.00, 1.00) < $this->attr()->luck;
     
         if ($evaded) {
             $this->battle->pushMessage(
