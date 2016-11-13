@@ -16,11 +16,14 @@ abstract class Battler
     private $attributes;
     private $turn_attributes;
     
-    // Special skills
+    // Special skills loaded for this instance
     private $pre_turn_skills = [];
     private $post_turn_skills = [];
     
-    // Attribute definitions
+    // Special skills to load (override in implementing class)
+    protected $skills = [];
+
+    // Attribute definitions (override in implementing class)
     protected $definitions = [
         'health' => ['min' => 0, 'max' => 100],
         'strength' => ['min' => 0, 'max' => 100],
@@ -28,9 +31,6 @@ abstract class Battler
         'speed' => ['min' => 0, 'max' => 100],
         'luck' => ['min' => 0.00, 'max' => 1.00],
     ];
-    
-    // Special skills
-    protected $skills = [];
     
     /**
      * Initialise a new combatant and generate attributes.
@@ -59,7 +59,6 @@ abstract class Battler
             'type' => (new \ReflectionClass($this))->getShortName(),
             
             // Status and effects
-            'hit_opponent' => false,
             'was_hit' => false,
             'stunned' => false,
             'evaded' => false,
@@ -82,6 +81,16 @@ abstract class Battler
         
         // Prepare for next turn.
         $this->initNextTurn();
+    }
+    
+    /**
+     * Prepate for next turn.
+     *
+     * @return void
+     */
+    public function initNextTurn()
+    {
+        $this->turn_attributes = $this->attributes;
     }
 
     /**
@@ -111,7 +120,7 @@ abstract class Battler
      */
     public function attack(Battler $opponent)
     {
-        // Miss this attack if attacked is stunned
+        // Miss this attack if attacker is stunned
         if ($this->attr()->stunned) {
             $this->battle->pushMessage(
                 "{$this->attr()->name} is stunned and cannot attack"
@@ -133,20 +142,6 @@ abstract class Battler
     }
     
     /**
-     * Defend against an attack from the opposing Battler.
-     *
-     * @param Battler $opponent
-     *
-     * @return void
-     */
-    public function defend(Battler $opponent)
-    {
-        // Calculate and apply damage (prevent negative damage)
-        $damage = max(0, $opponent->attr()->strength - $this->attr()->defence);
-        $this->takeDamage($damage, $opponent);
-    }
-    
-    /**
      * Try to evade an incoming attack.
      *
      * @param Battler $opponent
@@ -161,11 +156,25 @@ abstract class Battler
             $this->battle->pushMessage(
                 "{$opponent->attr()->name} was unlucky and missed their attack"
             );
+            
+            $this->attr(['evaded' => true]);
         }
         
-        $this->attr(compact('evaded'));
-        
         return $evaded;
+    }
+        
+    /**
+     * Defend against an attack from the opposing Battler.
+     *
+     * @param Battler $opponent
+     *
+     * @return void
+     */
+    public function defend(Battler $opponent)
+    {
+        // Calculate and apply damage (prevent negative damage)
+        $damage = max(0, $opponent->attr()->strength - $this->attr()->defence);
+        $this->takeDamage($damage, $opponent);
     }
     
     /**
@@ -184,7 +193,7 @@ abstract class Battler
         );
         
         $this->battle->pushMessage(
-            "{$this->attr()->name} received {$damage} damage, {$this->attr()->health} health remaining"
+            "{$this->attr()->name} received {$damage} damage and has {$this->attr()->health} health remaining"
         );
         
         // End the battle if damage is fatal
@@ -225,15 +234,5 @@ abstract class Battler
         foreach($this->post_turn_skills as $skill) {
             $skill->activate($this);
         }
-    }
-    
-    /**
-     * Prepate for next turn.
-     *
-     * @return void
-     */
-    public function initNextTurn()
-    {
-        $this->turn_attributes = $this->attributes;
     }
 }

@@ -66,12 +66,11 @@ class Battle
      */
     public function calculateTurn()
     {
-        // Run pre skills, attack, run post skills, init next turn, rotate
+        // Run pre skills, attack, run post skills, init next turn
         $this->player_current->preTurnSkills();
         $this->player_current->attack($this->player_opponent);
         $this->player_current->postTurnSkills();
         $this->player_current->initNextTurn();
-        $this->rotatePlayers();
         
         // Check/increment current turn
         if ($this->current_turn++ === $this->max_turns) {
@@ -79,6 +78,8 @@ class Battle
             $this->pushMessage("{$this->max_turns} turns exceeded, a draw is declared.");
         }
         
+        // Rotate players for the next turn
+        $this->rotatePlayers();
     }
     
     /**
