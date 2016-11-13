@@ -8,7 +8,7 @@ use dwalker109\Battler\Swordsman;
 
 class Battle
 {
-    // Track and display battle state
+    // Manage battle state
     public $is_active = true;
     
     // Handles to participants
@@ -45,12 +45,12 @@ class Battle
         ];
 
         // Sort by defence, ascending
-        usort($players, function($left, $right) {
+        usort($players, function ($left, $right) {
             return $left->attr()->defence <=> $right->attr()->defence;
         });
         
         // Sort by speed, descending
-        usort($players, function($left, $right) {
+        usort($players, function ($left, $right) {
             return $right->attr()->speed <=> $left->attr()->speed;
         });
         

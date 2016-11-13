@@ -1,6 +1,7 @@
 <?php
 
 namespace dwalker109\Skills;
+
 use dwalker109\Battler\Battler;
 
 class StunningBlow implements SkillContract
@@ -12,7 +13,7 @@ class StunningBlow implements SkillContract
      */
     public function type()
     {
-        return static::POST;
+        return static::PRE;
     }
     
     /**

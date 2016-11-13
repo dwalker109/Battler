@@ -1,6 +1,7 @@
 <?php
 
 namespace dwalker109\Skills;
+
 use dwalker109\Battler\Battler;
 
 class LuckyStrike implements SkillContract

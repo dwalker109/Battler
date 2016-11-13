@@ -49,15 +49,22 @@ class CliBattleCommand extends Command
                     );
                 }
                 
+                if (strlen($answer) < 1) {
+                    throw new \RuntimeException(
+                        'You did not enter a name for the combatant.'
+                    );
+                }
+                
                 return $answer;
             });
             
             $names[$label] = $helper->ask($input, $output, $question);
         }
         
-        // Create the battle and detail the generated combatants
+        // Create the battle, generating a battler for each name
         $battle = new Battle($names['first'], $names['second']);
         
+        // Output a table detailing each combatant
         $table = new Table($output);
         $table->setHeaders(
             ['Order', 'Name', 'Type', 'Health', 'Strength', 'Defence', 'Speed', 'Luck']
