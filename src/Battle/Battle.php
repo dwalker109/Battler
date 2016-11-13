@@ -8,19 +8,17 @@ use dwalker109\Battler\Swordsman;
 
 class Battle
 {
-    // Properties to track and display battle state
+    // Track and display battle state
     public $is_active = true;
-    public $messages = [];
-    public $player_1;
-    public $player_2;
     
-    // Turn tracking
+    // Handles to participants
+    public $player_current;
+    public $player_opponent;
+    
+    // Turn and message tracking
     private $max_turns = 30;
     private $current_turn = 1;
-    
-    // Internal handles to participants
-    private $player_current;
-    private $player_next;
+    private $messages = [];
     
     // Register available battler types
     private $battler_types = [
@@ -57,8 +55,8 @@ class Battle
         });
         
         // Use the ordered array to set 'pointers' for the players
-        $this->player_current = $this->player_1 = array_shift($players);
-        $this->player_next = $this->player_2 = array_shift($players);
+        $this->player_current = array_shift($players);
+        $this->player_opponent = array_shift($players);
     }
         
     /**
@@ -70,7 +68,7 @@ class Battle
     {
         // Run pre skills, attack, run post skills, init next turn, rotate
         $this->player_current->preTurnSkills();
-        $this->player_current->attack($this->player_next);
+        $this->player_current->attack($this->player_opponent);
         $this->player_current->postTurnSkills();
         $this->player_current->initNextTurn();
         $this->rotatePlayers();
@@ -91,8 +89,8 @@ class Battle
     private function rotatePlayers()
     {
         $pointer = $this->player_current;
-        $this->player_current = $this->player_next;
-        $this->player_next = $pointer;
+        $this->player_current = $this->player_opponent;
+        $this->player_opponent = $pointer;
     }
     
     /**

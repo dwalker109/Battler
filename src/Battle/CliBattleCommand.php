@@ -63,7 +63,7 @@ class CliBattleCommand extends Command
             ['Order', 'Name', 'Type', 'Health', 'Strength', 'Defence', 'Speed', 'Luck']
         );
         
-        foreach (['player_1', 'player_2'] as $index => $player) {
+        foreach (['player_current', 'player_opponent'] as $index => $player) {
             $table->addRow(
                 [
                     $index === 0 ? 'First' : 'Second',
