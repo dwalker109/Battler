@@ -48,12 +48,12 @@ class Battle
 
         // Sort by defence, ascending
         usort($players, function($left, $right) {
-            return $left->read()->defence <=> $right->read()->defence;
+            return $left->attr()->defence <=> $right->attr()->defence;
         });
         
         // Sort by speed, descending
         usort($players, function($left, $right) {
-            return $right->read()->speed <=> $left->read()->speed;
+            return $right->attr()->speed <=> $left->attr()->speed;
         });
         
         // Use the ordered array to set 'pointers' for the players
@@ -68,8 +68,9 @@ class Battle
      */
     public function calculateTurn()
     {
-        // Attack and rotate
+        // Attack, cleanup and rotate
         $this->player_current->attack($this->player_next);
+        $this->player_current->initNextTurn();
         $this->rotatePlayers();
         
         // Check/increment current turn

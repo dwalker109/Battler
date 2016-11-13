@@ -9,43 +9,22 @@ abstract class Battler
     // Handle to the current battle
     private $battle;
     
-    // Basic battler properties
+    // Battler detail and baseline/turn attributes
     private $name;
-    private $health;
-    private $strength;
-    private $defence;
-    private $speed;
-    private $luck;
+    private $attributes;
+    private $turn_attributes;
     
-    // Action message for this turn
-    private $messages = [];
-
-    // Value constraints used during construction
-    protected $property_constraints = [
-        "health" => [
-            "min" => 0,
-            "max" => 100,
-        ],
-        "strength" => [
-            "min" => 0,
-            "max" => 100,
-        ],
-        "defence" => [
-            "min" => 0,
-            "max" => 100,
-        ],
-        "speed" => [
-            "min" => 0,
-            "max" => 100,
-        ],
-        "luck" => [
-            "min" => 0.00,
-            "max" => 1.00,
-        ],
+    // Attribute definitions
+    protected $definitions = [
+        'health' => ['min' => 0, 'max' => 100],
+        'strength' => ['min' => 0, 'max' => 100],
+        'defence' => ['min' => 0, 'max' => 100],
+        'speed' => ['min' => 0, 'max' => 100],
+        'luck' => ['min' => 0.00, 'max' => 1.00],
     ];
     
     /**
-     * Initialise a new combatant and randomly generate properties.
+     * Initialise a new combatant and generate attributes.
      *
      * @param string $name
      * @param Battle $battle
@@ -57,29 +36,44 @@ abstract class Battler
         $this->name = $name;
         $this->battle = $battle;
         
-        foreach ($this->property_constraints as $property => $constraints) {
-            $this->{$property} = property_exists($this, $property)
-                ? $this->random($constraints['min'], $constraints['max'])
-                : 0;
+        // Build attributes from definitions
+        foreach ($this->definitions as $attribute => $constraints) {
+            $this->attributes[$attribute] = $this->random(
+                $constraints['min'], $constraints['max']
+            );
         }
+        
+        // Add additional attributes
+        $this->attributes += [
+            // Display
+            'name' => ucfirst($this->name),
+            'type' => (new \ReflectionClass($this))->getShortName(),
+            
+            // Status and effects
+            'stunned' => false,
+            'evaded' => false,
+        ];
+        
+        // Prepare for next turn.
+        $this->initNextTurn();
     }
 
     /**
-     * Return readable property values, with (TODO!) this turn's modifiers applied.
+     * Set/return attribute properties for this turn.
+     *
+     * @param array $values
      *
      * @return srdClass
      */
-    public function read()
+    public function attr($values = null)
     {
-        return (object) [
-            'name' => ucfirst($this->name),
-            'type' => (new \ReflectionClass($this))->getShortName(),
-            'health' => $this->health,
-            'strength' => $this->strength,
-            'defence' => $this->defence,
-            'speed' => $this->speed,
-            'luck' => $this->luck,
-        ];
+        // Set any turn attributes passed, ignoring any which don't exist
+        if (is_array($values)) {
+            $filtered = array_intersect_key($this->turn_attributes, $values);
+            $this->turn_attributes = array_merge($this->turn_attributes, $filtered);
+        }
+        
+        return (object) $this->turn_attributes;
     }
     
     /**
@@ -114,12 +108,10 @@ abstract class Battler
     public function attack(Battler $opponent)
     {
         // Use opponent's luck to calculate if the attack should miss
-        $attack_missed = $this->random(0.00, 1.00) < $opponent->read()->luck;
-
-        switch ($attack_missed) {
+        switch ($opponent->evade()) {
             case true:
                 $this->battle->pushMessage(
-                    "{$this->read()->name} was unlucky and missed their attack"
+                    "{$this->attr()->name} was unlucky and missed their attack"
                 );
                 
                 break;
@@ -127,33 +119,49 @@ abstract class Battler
             case false;
             default:
                 $this->battle->pushMessage(
-                    "{$this->read()->name} attacked with {$this->read()->strength} strength"
+                    "{$this->attr()->name} attacked with {$this->attr()->strength} strength"
                 );
                 
-                $opponent->receiveAttack($this);
+                $opponent->defend($this);
                 
                 break;
         }
     }
     
     /**
-     * Receive an attack from the opposing Battler.
+     * Defend against an attack from the opposing Battler.
      *
      * @param Battler $opponent
      *
      * @return void
      */
-    public function receiveAttack(Battler $opponent)
+    public function defend(Battler $opponent)
     {
-        $damage = $opponent->read()->strength - $this->read()->defence;
-        $this->health -= $damage;
+        // Calculate damage (prevent negative damage) and subtract from health
+        $damage = max(0, $opponent->attr()->strength - $this->attr()->defence);
+        $this->attributes['health'] -= $damage;
         
-        $this->battle->pushMessage("{$this->read()->name} received {$damage} damage");
+        $this->battle->pushMessage("{$this->attr()->name} received {$damage} damage");
         
+        // End the battle if attack was fatal
         if (!$this->isAlive()) {
             $this->battle->is_active = false;
-            $this->battle->pushMessage("{$opponent->read()->name} is the winner!");
+            $this->battle->pushMessage("{$opponent->attr()->name} is the winner!");
         }
+    }
+    
+    /**
+     * Try to evade an incoming attack.
+     *
+     * @return boolean
+     */
+    public function evade()
+    {
+        $evaded = $this->random(0.00, 1.00) < $this->attr()->luck;
+        
+        $this->attr(compact('evaded'));
+        
+        return $evaded;
     }
     
     /**
@@ -163,10 +171,20 @@ abstract class Battler
      */
     public function isAlive()
     {
-        if ($this->health <= 0) {
+        if ($this->attr()->health <= 0) {
             return false;
         }
         
         return true;
+    }
+    
+    /**
+     * Prepate for next turn.
+     *
+     * @return void
+     */
+    public function initNextTurn()
+    {
+        $this->turn_attributes = $this->attributes;
     }
 }

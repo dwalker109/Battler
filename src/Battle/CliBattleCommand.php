@@ -67,13 +67,13 @@ class CliBattleCommand extends Command
             $table->addRow(
                 [
                     $index === 0 ? 'First' : 'Second',
-                    $battle->{$player}->read()->name,
-                    $battle->{$player}->read()->type,
-                    $battle->{$player}->read()->health,
-                    $battle->{$player}->read()->strength,
-                    $battle->{$player}->read()->defence,
-                    $battle->{$player}->read()->speed,
-                    $battle->{$player}->read()->luck,
+                    $battle->{$player}->attr()->name,
+                    $battle->{$player}->attr()->type,
+                    $battle->{$player}->attr()->health,
+                    $battle->{$player}->attr()->strength,
+                    $battle->{$player}->attr()->defence,
+                    $battle->{$player}->attr()->speed,
+                    $battle->{$player}->attr()->luck,
                 ]
             );
         }
