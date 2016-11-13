@@ -24,7 +24,7 @@ class LuckyStrike implements SkillContract
      */
     public function activate(Battler $battler)
     {
-        if ($battler->random(0, 100) <= 20) {
+        if ($battler->random(1, 100) <= 5) {
             $battler->attr(['strength' => $battler->attr()->strength * 2]);
             $battler->battle->pushMessage("{$battler->attr()->name} activated skill Lucky Strike");
         }
