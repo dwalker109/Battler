@@ -69,7 +69,7 @@ abstract class Battler
     {
         // Set any turn attributes passed, ignoring any which don't exist
         if (is_array($values)) {
-            $filtered = array_intersect_key($this->turn_attributes, $values);
+            $filtered = array_intersect_key($values, $this->turn_attributes);
             $this->turn_attributes = array_merge($this->turn_attributes, $filtered);
         }
         
@@ -84,7 +84,7 @@ abstract class Battler
      *
      * @return int|float
      */
-    private function random($min, $max)
+    public function random($min, $max)
     {
         if (is_integer($min) && is_integer($max)) {
             return mt_rand($min, $max);
